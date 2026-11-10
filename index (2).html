@@ -1,0 +1,2823 @@
+html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aromika Coffee — Two Beans, Different Characters, One Quality</title>
+
+  <!-- Google Fonts: Playfair Display (Serif Elegan) & Plus Jakarta Sans (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- React & ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Babel Standalone untuk JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Konfigurasi Kustom Tailwind & Tema Warna Aromika -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            aromika: {
+              dark: '#1F1209',      // Espresso Black/Dark Chocolate
+              roast: '#2D1B10',     // Coffee Brown
+              mocha: '#4A2F1E',     // Warm Chocolate
+              gold: '#C5A880',      // Soft Gold
+              goldlight: '#E2D1BA', // Light Champagne Gold
+              beige: '#F5EFEB',     // Soft Creamy Beige
+              cream: '#FAF7F2',     // Background Utama
+              light: '#FFFFFF',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #1F1209;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      scroll-behavior: smooth;
+    }
+    h1, h2, h3, .font-serif {
+      font-family: 'Playfair Display', serif;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF7F2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C5A880;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4A2F1E;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- SCRIPT APLIKASI REACT -->
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // ==========================================
+    // DATA DEFAULT AWAL (INITIAL LOCAL STORAGE)
+    // ==========================================
+    const DEFAULT_PRODUCTS = [
+      {
+        id: "prod-1",
+        name: "Arabika Aceh Gayo",
+        category: "Arabika",
+        basePrice: 85000,
+        stock: 32,
+        rating: 4.9,
+        reviewsCount: 128,
+        isBestSeller: true,
+        aroma: 5,
+        acidity: "Medium-High",
+        body: "Medium Silky",
+        flavorNotes: ["Peach", "Floral Jasmine", "Brown Sugar", "Clean Aftertaste"],
+        image: "https://images.unsplash.com/photo-1587734195503-904fca47e0e9?q=80&w=800&auto=format&fit=crop",
+        description: "Ditanam di dataran tinggi Gayo Aceh pada ketinggian 1.400 mdpl. Menghasilkan profil rasa buah manis tropis dengan keharuman bunga melati yang semerbak dan keasaman segar yang bersih."
+      },
+      {
+        id: "prod-2",
+        name: "Arabika Bali Kintamani",
+        category: "Arabika",
+        basePrice: 80000,
+        stock: 24,
+        rating: 4.8,
+        reviewsCount: 94,
+        isBestSeller: true,
+        aroma: 5,
+        acidity: "Bright & Crisp",
+        body: "Light-Medium",
+        flavorNotes: ["Citrus Orange", "Caramel", "Dark Cocoa", "Fresh Herbs"],
+        image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=800&auto=format&fit=crop",
+        description: "Kopi khas Kintamani yang dibudidayakan berdampingan dengan kebun jeruk Bali. Menghasilkan keasaman sitrus segar berpadu sentuhan cokelat karamel yang memanjakan lidah."
+      },
+      {
+        id: "prod-3",
+        name: "Arabika Toraja Sapan",
+        category: "Arabika",
+        basePrice: 90000,
+        stock: 18,
+        rating: 4.9,
+        reviewsCount: 82,
+        isBestSeller: false,
+        aroma: 4.5,
+        acidity: "Mild Balanced",
+        body: "Full & Syrupy",
+        flavorNotes: ["Sweet Cedar", "Dark Chocolate", "Spicy Clove", "Ripe Plum"],
+        image: "https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?q=80&w=800&auto=format&fit=crop",
+        description: "Berasal dari lereng pegunungan Sapan Toraja Utara. Dikenal dengan karakter rempah aromatik manis, body tebal menyerupai sirup, dan sentuhan cokelat pekat khas nusantara."
+      },
+      {
+        id: "prod-4",
+        name: "Robusta Lampung Gold",
+        category: "Robusta",
+        basePrice: 55000,
+        stock: 45,
+        rating: 4.7,
+        reviewsCount: 156,
+        isBestSeller: true,
+        aroma: 4,
+        acidity: "Very Low",
+        body: "Bold & Heavy",
+        flavorNotes: ["Dark Cacao", "Roasted Hazelnut", "Earthy Molasses", "Thick Crema"],
+        image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=800&auto=format&fit=crop",
+        description: "Ikon kopi Sumatera dengan body yang sangat kuat dan tebal. Pilihan sempurna untuk penikmat kopi tubruk otentik atau campuran kopi susu dengan crema yang kaya dan bertekstur."
+      },
+      {
+        id: "prod-5",
+        name: "Robusta Temanggung Premium",
+        category: "Robusta",
+        basePrice: 60000,
+        stock: 28,
+        rating: 4.8,
+        reviewsCount: 71,
+        isBestSeller: false,
+        aroma: 4,
+        acidity: "Low",
+        body: "Full Bodied",
+        flavorNotes: ["Tobacco Sweet", "Dark Chocolate", "Caramelized Sugar", "Nutty"],
+        image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=800&auto=format&fit=crop",
+        description: "Dipetik merah sempurna dari lereng Gunung Sindoro & Sumbing. Memiliki aroma tembakau manis yang elegan, keasaman sangat rendah, dan aftertaste cokelat panggang yang tahan lama."
+      },
+      {
+        id: "prod-6",
+        name: "Robusta Dampit Malang",
+        category: "Robusta",
+        basePrice: 58000,
+        stock: 30,
+        rating: 4.8,
+        reviewsCount: 89,
+        isBestSeller: false,
+        aroma: 4.5,
+        acidity: "Low",
+        body: "Heavy & Smooth",
+        flavorNotes: ["Roasted Almond", "Cacao Nibs", "Brown Sugar", "Spicy Warmth"],
+        image: "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=800&auto=format&fit=crop",
+        description: "Kopi kebanggaan Jawa Timur yang sudah mendunia. Memiliki rasa manis karamel alami yang unik untuk jenis robusta, dengan tekstur creamy dan pahit yang bersih di akhir tegukan."
+      }
+    ];
+
+    const DEFAULT_ORDERS = [
+      {
+        orderId: "ARMK-2025-8812",
+        date: "2025-05-10 14:20",
+        customerName: "Raditya Pratama",
+        phone: "081298765432",
+        email: "raditya@email.com",
+        address: "Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan",
+        shipping: "JNE Reguler (Rp 18.000)",
+        paymentMethod: "Transfer Bank BCA",
+        items: [
+          { name: "Arabika Aceh Gayo", weight: "250 gram", grind: "Biji Utuh", qty: 2, price: 187000 }
+        ],
+        total: 392000,
+        status: "Diproses"
+      }
+    ];
+
+    // Helper Format Rupiah
+    const formatRupiah = (val) => {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+      }).format(val);
+    };
+
+    // Helper Multiplier Berat Kemasan
+    const WEIGHT_MULTIPLIERS = {
+      "100 gram": 1.0,
+      "250 gram": 2.2,
+      "500 gram": 4.0
+    };
+
+    // ==========================================
+    // KOMPONEN UTAMA APLIKASI
+    // ==========================================
+    function App() {
+      // Navigation State
+      const [currentView, setCurrentView] = useState("home"); // 'home' | 'shop' | 'about' | 'contact' | 'admin'
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+      // Data States dengan LocalStorage Sync
+      const [products, setProducts] = useState(() => {
+        const saved = localStorage.getItem("aromika_products");
+        return saved ? JSON.parse(saved) : DEFAULT_PRODUCTS;
+      });
+
+      const [cart, setCart] = useState(() => {
+        const saved = localStorage.getItem("aromika_cart");
+        return saved ? JSON.parse(saved) : [];
+      });
+
+      const [wishlist, setWishlist] = useState(() => {
+        const saved = localStorage.getItem("aromika_wishlist");
+        return saved ? JSON.parse(saved) : [];
+      });
+
+      const [orders, setOrders] = useState(() => {
+        const saved = localStorage.getItem("aromika_orders");
+        return saved ? JSON.parse(saved) : DEFAULT_ORDERS;
+      });
+
+      const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem("aromika_user");
+        return saved ? JSON.parse(saved) : null;
+      });
+
+      // UI Modals & Drawers
+      const [selectedProduct, setSelectedProduct] = useState(null);
+      const [isCartOpen, setIsCartOpen] = useState(false);
+      const [isAuthOpen, setIsAuthOpen] = useState(false);
+      const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+      const [lastCompletedOrder, setLastCompletedOrder] = useState(null);
+      const [toastMessage, setToastMessage] = useState(null);
+      const [showBackToTop, setShowBackToTop] = useState(false);
+
+      // Search & Filter State untuk Halaman Shop
+      const [searchQuery, setSearchQuery] = useState("");
+      const [selectedCategory, setSelectedCategory] = useState("Semua"); // 'Semua' | 'Arabika' | 'Robusta'
+      const [sortBy, setSortBy] = useState("default"); // 'default' | 'price-asc' | 'price-desc' | 'bestseller'
+
+      // Simpan perubahan ke LocalStorage
+      useEffect(() => {
+        localStorage.setItem("aromika_products", JSON.stringify(products));
+      }, [products]);
+
+      useEffect(() => {
+        localStorage.setItem("aromika_cart", JSON.stringify(cart));
+      }, [cart]);
+
+      useEffect(() => {
+        localStorage.setItem("aromika_wishlist", JSON.stringify(wishlist));
+      }, [wishlist]);
+
+      useEffect(() => {
+        localStorage.setItem("aromika_orders", JSON.stringify(orders));
+      }, [orders]);
+
+      useEffect(() => {
+        if (user) {
+          localStorage.setItem("aromika_user", JSON.stringify(user));
+        } else {
+          localStorage.removeItem("aromika_user");
+        }
+      }, [user]);
+
+      // Scroll to Top Listener
+      useEffect(() => {
+        const handleScroll = () => {
+          if (window.scrollY > 300) setShowBackToTop(true);
+          else setShowBackToTop(false);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+      }, []);
+
+      // Inisialisasi Lucide Icons setiap render
+      useEffect(() => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      });
+
+      // Toast notification helper
+      const showToast = (msg) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(null), 3500);
+      };
+
+      // Cart Calculations
+      const cartCount = useMemo(() => {
+        return cart.reduce((total, item) => total + item.qty, 0);
+      }, [cart]);
+
+      const cartSubtotal = useMemo(() => {
+        return cart.reduce((total, item) => total + (item.price * item.qty), 0);
+      }, [cart]);
+
+      // Handle Add to Cart
+      const handleAddToCart = (product, weight = "250 gram", grind = "Biji Utuh", qty = 1) => {
+        const itemPrice = Math.round(product.basePrice * (WEIGHT_MULTIPLIERS[weight] || 1));
+        const cartItemId = `${product.id}-${weight}-${grind}`;
+
+        setCart(prev => {
+          const existing = prev.find(item => item.cartItemId === cartItemId);
+          if (existing) {
+            return prev.map(item =>
+              item.cartItemId === cartItemId
+                ? { ...item, qty: item.qty + qty }
+                : item
+            );
+          } else {
+            return [
+              ...prev,
+              {
+                cartItemId,
+                productId: product.id,
+                name: product.name,
+                category: product.category,
+                image: product.image,
+                weight,
+                grind,
+                price: itemPrice,
+                qty
+              }
+            ];
+          }
+        });
+        showToast(`Berhasil menambahkan "${product.name} (${weight})" ke keranjang!`);
+      };
+
+      // Cart Modifications
+      const updateCartQty = (cartItemId, delta) => {
+        setCart(prev => prev.map(item => {
+          if (item.cartItemId === cartItemId) {
+            const newQty = item.qty + delta;
+            return newQty > 0 ? { ...item, qty: newQty } : null;
+          }
+          return item;
+        }).filter(Boolean));
+      };
+
+      const removeFromCart = (cartItemId) => {
+        setCart(prev => prev.filter(item => item.cartItemId !== cartItemId));
+        showToast("Produk dihapus dari keranjang.");
+      };
+
+      // Toggle Wishlist
+      const toggleWishlist = (productId) => {
+        if (wishlist.includes(productId)) {
+          setWishlist(prev => prev.filter(id => id !== productId));
+          showToast("Dihapus dari daftar favorit.");
+        } else {
+          setWishlist(prev => [...prev, productId]);
+          showToast("Ditambahkan ke daftar favorit!");
+        }
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col bg-aromika-cream text-aromika-dark antialiased selection:bg-aromika-gold selection:text-white">
+          
+          {/* TOAST NOTIFIKASI */}
+          {toastMessage && (
+            <div className="fixed bottom-6 right-6 z-50 bg-aromika-roast text-aromika-cream border border-aromika-gold px-5 py-3.5 rounded-xl shadow-2xl flex items-center space-x-3 transition-all transform animate-bounce">
+              <span className="w-2.5 h-2.5 rounded-full bg-aromika-gold animate-ping"></span>
+              <p className="text-sm font-medium">{toastMessage}</p>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* NAVBAR SECTION */}
+          {/* ========================================================= */}
+          <header className="sticky top-0 z-40 bg-aromika-cream/90 backdrop-blur-md border-b border-aromika-goldlight/40 transition-all">
+            {/* Top Bar Pengumuman */}
+            <div className="bg-aromika-roast text-aromika-goldlight text-xs tracking-widest text-center py-2 px-4 uppercase font-medium">
+              Gratis Ongkos Kirim Seluruh Indonesia untuk Pemesanan di Atas Rp 250.000 • Roasting Segar Setiap Hari
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between h-20">
+                
+                            {/* Logo Brand */}
+            <div
+              onClick={() => { setCurrentView("home"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              className="cursor-pointer flex items-center space-x-3 group"
+            >
+              <img
+                src="logo aromika.jpeg"
+                alt="Aromika Coffee Logo"
+                className="h-14 sm:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+
+                {/* Navigasi Desktop */}
+                <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold tracking-wide uppercase">
+                  {[
+                    { id: "home", label: "Home" },
+                    { id: "shop", label: "Shop" },
+                    { id: "about", label: "About Us" },
+                    { id: "contact", label: "Contact" },
+                    { id: "admin", label: "Admin Panel" },
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setCurrentView(tab.id);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={`relative py-1 transition-colors hover:text-aromika-mocha ${
+                        currentView === tab.id 
+                          ? "text-aromika-mocha font-bold after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-aromika-gold" 
+                          : "text-aromika-dark/80"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </nav>
+
+                {/* Action Icons (Search, Wishlist, Cart, Profile) */}
+                <div className="flex items-center space-x-4">
+                  {/* Search Icon Shortcut */}
+                  <button
+                    onClick={() => {
+                      setCurrentView("shop");
+                      window.scrollTo({ top: 400, behavior: "smooth" });
+                    }}
+                    title="Cari Kopi"
+                    className="p-2 text-aromika-roast hover:text-aromika-gold transition-colors rounded-full hover:bg-aromika-beige"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </button>
+
+                  {/* Wishlist Shortcut */}
+                  <button
+                    onClick={() => {
+                      setCurrentView("shop");
+                      setSortBy("bestseller");
+                      showToast(`Daftar Favorit: ${wishlist.length} produk`);
+                    }}
+                    title="Wishlist"
+                    className="p-2 text-aromika-roast hover:text-aromika-gold transition-colors rounded-full hover:bg-aromika-beige relative"
+                  >
+                    <svg className="w-5 h-5" fill={wishlist.length > 0 ? "#C5A880" : "none"} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    {wishlist.length > 0 && (
+                      <span className="absolute top-1 right-1 bg-aromika-roast text-aromika-gold text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                        {wishlist.length}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Keranjang Belanja */}
+                  <button
+                    onClick={() => setIsCartOpen(true)}
+                    className="p-2 text-aromika-roast hover:text-aromika-gold transition-colors rounded-full hover:bg-aromika-beige relative"
+                    title="Keranjang Belanja"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-simple"></path>
+                      <path d="M3 6h18"></path>
+                      <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    {cartCount > 0 && (
+                      <span className="absolute top-1 right-1 bg-aromika-gold text-aromika-dark text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+                        {cartCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Akun Pengguna */}
+                  <button
+                    onClick={() => setIsAuthOpen(true)}
+                    className="flex items-center space-x-2 text-sm font-semibold p-2 rounded-full hover:bg-aromika-beige text-aromika-roast transition-colors"
+                    title="Akun Pengguna"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-aromika-gold/30 border border-aromika-gold flex items-center justify-center text-aromika-dark font-bold text-xs">
+                      {user ? user.name.charAt(0).toUpperCase() : "U"}
+                    </div>
+                  </button>
+
+                  {/* Mobile Menu Button */}
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="md:hidden p-2 text-aromika-dark"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}></path>
+                    </svg>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Mobile Drawer Menu */}
+            {mobileMenuOpen && (
+              <div className="md:hidden bg-aromika-cream border-b border-aromika-goldlight px-4 pt-2 pb-6 space-y-3">
+                {[
+                  { id: "home", label: "Home" },
+                  { id: "shop", label: "Shop" },
+                  { id: "about", label: "About Us" },
+                  { id: "contact", label: "Contact" },
+                  { id: "admin", label: "Admin Panel" },
+                ].map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setCurrentView(item.id);
+                      setMobileMenuOpen(false);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="block w-full text-left py-2 px-3 text-base font-semibold text-aromika-dark rounded-md hover:bg-aromika-beige"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </header>
+
+          {/* ========================================================= */}
+          {/* BODY BERDASARKAN VIEW AKTIF */}
+          {/* ========================================================= */}
+          <main className="flex-grow">
+            {currentView === "home" && (
+              <HomeView 
+                products={products}
+                onSelectProduct={(p) => setSelectedProduct(p)}
+                onAddToCart={handleAddToCart}
+                onGoToShop={() => {
+                  setCurrentView("shop");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                wishlist={wishlist}
+                onToggleWishlist={toggleWishlist}
+              />
+            )}
+
+            {currentView === "shop" && (
+              <ShopView
+                products={products}
+                onSelectProduct={(p) => setSelectedProduct(p)}
+                onAddToCart={handleAddToCart}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                wishlist={wishlist}
+                onToggleWishlist={toggleWishlist}
+              />
+            )}
+
+            {currentView === "about" && (
+              <AboutView onExploreShop={() => setCurrentView("shop")} />
+            )}
+
+            {currentView === "contact" && (
+              <ContactView showToast={showToast} />
+            )}
+
+            {currentView === "admin" && (
+              <AdminDashboard
+                products={products}
+                setProducts={setProducts}
+                orders={orders}
+                setOrders={setOrders}
+                showToast={showToast}
+              />
+            )}
+          </main>
+
+          {/* ========================================================= */}
+          {/* FOOTER ELEGAN */}
+          {/* ========================================================= */}
+          <footer className="bg-aromika-dark text-aromika-cream pt-16 pb-12 border-t-4 border-aromika-gold">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                
+                {/* Kolom 1: Profil Brand */}
+                <div className="space-y-4 md:col-span-1">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-aromika-cream p-1.5 rounded-xl inline-block">
+              <img 
+                   src="logo aromika.jpeg" 
+                   alt="Aromika Coffee Logo" 
+                 className="h-12 w-auto object-contain"
+              />
+            </div>
+                  </div>
+                  <p className="text-aromika-goldlight/80 text-sm leading-relaxed">
+                    "Two Beans, Different Characters, One Quality."
+                  </p>
+                  <p className="text-xs text-aromika-goldlight/60">
+                    Menghadirkan karakter biji Arabika dan Robusta nusantara dengan standar artisan roastery untuk setiap pecinta kopi sejati.
+                  </p>
+                </div>
+
+                {/* Kolom 2: Navigasi Cepat */}
+                <div>
+                  <h4 className="font-serif text-lg font-semibold text-aromika-gold mb-4 tracking-wide">Navigasi</h4>
+                  <ul className="space-y-2 text-sm text-aromika-goldlight/80">
+                    <li><button onClick={() => setCurrentView("home")} className="hover:text-aromika-gold transition-colors">Beranda</button></li>
+                    <li><button onClick={() => setCurrentView("shop")} className="hover:text-aromika-gold transition-colors">Katalog Kopi</button></li>
+                    <li><button onClick={() => setCurrentView("about")} className="hover:text-aromika-gold transition-colors">Tentang Kami</button></li>
+                    <li><button onClick={() => setCurrentView("contact")} className="hover:text-aromika-gold transition-colors">Hubungi Kami</button></li>
+                    <li><button onClick={() => setCurrentView("admin")} className="hover:text-aromika-gold transition-colors">Simulasi Admin</button></li>
+                  </ul>
+                </div>
+
+                {/* Kolom 3: Pilihan Kopi */}
+                <div>
+                  <h4 className="font-serif text-lg font-semibold text-aromika-gold mb-4 tracking-wide">Koleksi Biji Kopi</h4>
+                  <ul className="space-y-2 text-sm text-aromika-goldlight/80">
+                    <li>Arabika Aceh Gayo Specialty</li>
+                    <li>Arabika Bali Kintamani Natural</li>
+                    <li>Arabika Toraja Sapan Grade 1</li>
+                    <li>Robusta Lampung Gold Bold</li>
+                    <li>Robusta Temanggung Red Cherry</li>
+                    <li>Robusta Dampit Malang Dampak</li>
+                  </ul>
+                </div>
+
+                {/* Kolom 4: Hubungi & Jam Buka */}
+                <div>
+                  <h4 className="font-serif text-lg font-semibold text-aromika-gold mb-4 tracking-wide">Roastery & Lounge</h4>
+                  <p className="text-sm text-aromika-goldlight/80 leading-relaxed mb-3">
+                    Kp. Tejamaya, Desa Sukaraja, Kab. Tasikmalaya, Jawa Barat 46175
+                  </p>
+                  <p className="text-sm text-aromika-goldlight/80 mb-1">
+                    WhatsApp: <span className="text-aromika-gold font-medium">082119253416</span>
+                  </p>
+                  <p className="text-sm text-aromika-goldlight/80 mb-4">
+                    Email: <span className="text-aromika-gold font-medium">aromika225@gmail.com</span>
+                  </p>
+                  <div className="flex space-x-3 text-aromika-gold">
+                    <span className="w-8 h-8 rounded-full border border-aromika-gold/40 flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-aromika-gold hover:text-aromika-dark transition-all">IG</span>
+                    <span className="w-8 h-8 rounded-full border border-aromika-gold/40 flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-aromika-gold hover:text-aromika-dark transition-all">WA</span>
+                    <span className="w-8 h-8 rounded-full border border-aromika-gold/40 flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-aromika-gold hover:text-aromika-dark transition-all">YT</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="pt-8 border-t border-aromika-mocha/40 text-center text-xs text-aromika-goldlight/60 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p>© 2025 Aromika Coffee. Seluruh Hak Cipta Dilindungi. </p>
+                <p className="tracking-wider">ARABIKA & ROBUSTA INDONESIA BERKUALITAS</p>
+              </div>
+            </div>
+          </footer>
+
+          {/* ========================================================= */}
+          {/* FLOATING ACTION: BACK TO TOP BUTTON */}
+          {/* ========================================================= */}
+          {showBackToTop && (
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="fixed bottom-6 left-6 z-40 bg-aromika-roast text-aromika-gold border border-aromika-gold p-3 rounded-full shadow-xl hover:bg-aromika-mocha transition-all duration-300 group"
+              title="Kembali ke Atas"
+            >
+              <svg className="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+            </button>
+          )}
+
+          {/* ========================================================= */}
+          {/* MODAL / DRAWER KERANJANG BELANJA (CART) */}
+          {/* ========================================================= */}
+          {isCartOpen && (
+            <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm transition-opacity">
+              <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
+                <div className="w-screen max-w-md bg-aromika-cream text-aromika-dark shadow-2xl flex flex-col">
+                  
+                  {/* Cart Header */}
+                  <div className="p-6 bg-aromika-beige border-b border-aromika-goldlight flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-6 h-6 text-aromika-roast" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-simple"></path>
+                        <path d="M3 6h18"></path>
+                      </svg>
+                      <h3 className="font-serif text-xl font-bold text-aromika-roast">Keranjang Belanja</h3>
+                      <span className="text-xs bg-aromika-gold text-aromika-dark font-bold px-2 py-0.5 rounded-full">
+                        {cartCount} item
+                      </span>
+                    </div>
+                    <button 
+                      onClick={() => setIsCartOpen(false)}
+                      className="text-aromika-dark hover:text-red-600 transition-colors p-1"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Cart Items List */}
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {cart.length === 0 ? (
+                      <div className="text-center py-16 space-y-4">
+                        <div className="w-20 h-20 mx-auto rounded-full bg-aromika-beige flex items-center justify-center text-aromika-gold">
+                          <svg className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                          </svg>
+                        </div>
+                        <h4 className="font-serif text-lg font-bold text-aromika-dark">Keranjang Masih Kosong</h4>
+                        <p className="text-xs text-aromika-dark/60 max-w-xs mx-auto">
+                          Aroma kopi terbaik sedang menanti Anda. Pilih biji kopi Arabika atau Robusta favorit sekarang.
+                        </p>
+                        <button
+                          onClick={() => {
+                            setIsCartOpen(false);
+                            setCurrentView("shop");
+                          }}
+                          className="mt-4 px-6 py-2.5 bg-aromika-roast text-aromika-cream text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-aromika-mocha transition-all"
+                        >
+                          Mulai Belanja
+                        </button>
+                      </div>
+                    ) : (
+                      cart.map((item) => (
+                        <div 
+                          key={item.cartItemId} 
+                          className="bg-white p-4 rounded-xl border border-aromika-goldlight shadow-sm flex space-x-4 items-center"
+                        >
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold text-aromika-dark truncate">{item.name}</h4>
+                            <p className="text-[11px] text-aromika-dark/60">
+                              {item.weight} • {item.grind}
+                            </p>
+                            <p className="text-xs font-bold text-aromika-mocha mt-1">
+                              {formatRupiah(item.price)}
+                            </p>
+
+                            {/* Tombol Plus Minus */}
+                            <div className="flex items-center space-x-2 mt-2">
+                              <button
+                                onClick={() => updateCartQty(item.cartItemId, -1)}
+                                className="w-6 h-6 rounded bg-aromika-beige text-aromika-dark font-bold text-xs flex items-center justify-center hover:bg-aromika-goldlight"
+                              >
+                                -
+                              </button>
+                              <span className="text-xs font-semibold px-2">{item.qty}</span>
+                              <button
+                                onClick={() => updateCartQty(item.cartItemId, 1)}
+                                className="w-6 h-6 rounded bg-aromika-beige text-aromika-dark font-bold text-xs flex items-center justify-center hover:bg-aromika-goldlight"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col items-end justify-between self-stretch">
+                            <button
+                              onClick={() => removeFromCart(item.cartItemId)}
+                              className="text-aromika-dark/40 hover:text-red-500 transition-colors p-1"
+                              title="Hapus"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                            </button>
+                            <span className="text-xs font-bold text-aromika-dark">
+                              {formatRupiah(item.price * item.qty)}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Cart Footer */}
+                  {cart.length > 0 && (
+                    <div className="p-6 bg-aromika-beige border-t border-aromika-goldlight space-y-4">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-aromika-dark/70">Subtotal Belanja:</span>
+                        <span className="font-serif font-bold text-lg text-aromika-dark">{formatRupiah(cartSubtotal)}</span>
+                      </div>
+                      <p className="text-[11px] text-aromika-dark/60">
+                        *Biaya pengiriman dan promo akan dikalkulasi pada langkah checkout.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setIsCartOpen(false);
+                          setIsCheckoutOpen(true);
+                        }}
+                        className="w-full py-3.5 bg-aromika-roast text-aromika-gold border border-aromika-gold rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-aromika-mocha transition-all shadow-lg flex items-center justify-center space-x-2"
+                      >
+                        <span>Lanjut ke Pembayaran</span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                          <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* MODAL DETAIL PRODUK */}
+          {/* ========================================================= */}
+          {selectedProduct && (
+            <ProductDetailModal
+              product={selectedProduct}
+              onClose={() => setSelectedProduct(null)}
+              onAddToCart={handleAddToCart}
+              isFavorited={wishlist.includes(selectedProduct.id)}
+              onToggleWishlist={toggleWishlist}
+            />
+          )}
+
+          {/* ========================================================= */}
+          {/* MODAL CHECKOUT PEMESANAN */}
+          {/* ========================================================= */}
+          {isCheckoutOpen && (
+            <CheckoutModal
+              cart={cart}
+              cartSubtotal={cartSubtotal}
+              onClose={() => setIsCheckoutOpen(false)}
+              user={user}
+              onSuccessOrder={(newOrder) => {
+                setOrders(prev => [newOrder, ...prev]);
+                setCart([]); // Kosongkan keranjang
+                setIsCheckoutOpen(false);
+                setLastCompletedOrder(newOrder);
+              }}
+            />
+          )}
+
+          {/* ========================================================= */}
+          {/* MODAL ORDER SUCCESS / BUKTI PESANAN */}
+          {/* ========================================================= */}
+          {lastCompletedOrder && (
+            <OrderSuccessModal
+              order={lastCompletedOrder}
+              onClose={() => setLastCompletedOrder(null)}
+            />
+          )}
+
+          {/* ========================================================= */}
+          {/* MODAL AUTH (LOGIN / REGISTER SIMULASI) */}
+          {/* ========================================================= */}
+          {isAuthOpen && (
+            <AuthModal
+              user={user}
+              setUser={setUser}
+              onClose={() => setIsAuthOpen(false)}
+              showToast={showToast}
+            />
+          )}
+
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: HOME VIEW
+    // =========================================================
+    function HomeView({ products, onSelectProduct, onAddToCart, onGoToShop, wishlist, onToggleWishlist }) {
+      const bestSellers = products.filter(p => p.isBestSeller).slice(0, 3);
+
+      return (
+        <div className="space-y-24">
+          
+          {/* HERO SECTION */}
+          <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-aromika-dark text-aromika-cream">
+            {/* Background Image dengan Overlay Elegan */}
+            <div className="absolute inset-0 z-0">
+              <img 
+                src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=1920&auto=format&fit=crop" 
+                alt="Aromika Coffee Beans" 
+                className="w-full h-full object-cover opacity-35 scale-105 transform hover:scale-100 transition-transform duration-1000"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-aromika-dark via-aromika-dark/60 to-transparent"></div>
+            </div>
+
+            <div className="relative z-10 max-w-5xl mx-auto px-4 text-center space-y-8 py-20">
+              <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border border-aromika-gold/50 bg-aromika-roast/60 text-aromika-gold text-xs font-semibold tracking-widest uppercase mb-2">
+                <span>Artisan Roastery Indonesia</span>
+              </div>
+
+              <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-aromika-cream leading-tight">
+                Two Beans, Different Characters, <br />
+                <span className="italic text-aromika-gold">One Quality.</span>
+              </h1>
+
+              <p className="max-w-2xl mx-auto text-base sm:text-lg text-aromika-goldlight/80 leading-relaxed font-light">
+                Menghadirkan karakter Arabika yang kaya aroma buah dan floral, serta ketegasan Robusta yang pekat berpadu cokelat alami dalam setiap sajian biji kopi pilihan nusantara.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <button
+                  onClick={onGoToShop}
+                  className="w-full sm:w-auto px-8 py-4 bg-aromika-gold text-aromika-dark font-bold text-sm tracking-widest uppercase rounded-xl hover:bg-aromika-goldlight transition-all shadow-xl transform hover:-translate-y-1"
+                >
+                  Shop Now — Jelajahi Kopi
+                </button>
+                <a
+                  href="#duo-karakter"
+                  className="w-full sm:w-auto px-8 py-4 bg-transparent border border-aromika-gold/60 text-aromika-cream font-semibold text-sm tracking-widest uppercase rounded-xl hover:bg-aromika-cream/10 transition-all"
+                >
+                  Pahami Karakter Rasa
+                </a>
+              </div>
+
+              {/* Tag Highlights */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 text-center border-t border-aromika-gold/20 max-w-4xl mx-auto">
+                <div>
+                  <p className="text-2xl font-serif font-bold text-aromika-gold">100%</p>
+                  <p className="text-xs text-aromika-goldlight/70 uppercase">Biji Kopi Asli</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-serif font-bold text-aromika-gold">Fresh</p>
+                  <p className="text-xs text-aromika-goldlight/70 uppercase">Roasting Berkala</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-serif font-bold text-aromika-gold">2 Varietas</p>
+                  <p className="text-xs text-aromika-goldlight/70 uppercase">Arabika & Robusta</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-serif font-bold text-aromika-gold">Specialty</p>
+                  <p className="text-xs text-aromika-goldlight/70 uppercase">Grade Standar SCA</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ========================================================= */}
+          {/* SECTION: 4 KEUNGGULAN AROMIKA COFFEE */}
+          {/* ========================================================= */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+              <span className="text-xs font-bold tracking-[0.2em] text-aromika-gold uppercase">Filosofi Kami</span>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-aromika-roast">Keunggulan Aromika Coffee</h2>
+              <div className="w-16 h-1 bg-aromika-gold mx-auto mt-2"></div>
+              <p className="text-sm text-aromika-dark/70">
+                Komitmen kami menjaga kemurnian dan karakteristik kopi asli Indonesia dalam setiap butir sajian.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                {
+                  no: "01",
+                  title: "Dua Karakter, Satu Kualitas",
+                  desc: "Menghadirkan pilihan biji kopi Arabika dan Robusta dengan karakter rasa yang berbeda untuk memenuhi preferensi setiap penikmat kopi.",
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 2a10 10 0 0 1 0 20"></path>
+                    </svg>
+                  )
+                },
+                {
+                  no: "02",
+                  title: "Cita Rasa & Aroma Khas",
+                  desc: "Mengutamakan karakter alami kopi nusantara, mulai dari aroma floral buah Arabika hingga rasa bold dan crema tebal Robusta.",
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                      <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                      <line x1="6" y1="1" x2="6" y2="4"></line>
+                      <line x1="10" y1="1" x2="10" y2="4"></line>
+                      <line x1="14" y1="1" x2="14" y2="4"></line>
+                    </svg>
+                  )
+                },
+                {
+                  no: "03",
+                  title: "Fleksibilitas Karakter",
+                  desc: "Memberikan keleluasaan kepada konsumen untuk memilih jenis kopi, ukuran berat, dan tingkat gilingan sesuai metode seduh favorit Anda.",
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  )
+                },
+                {
+                  no: "04",
+                  title: "Identitas Produk Elegan",
+                  desc: "Mengusung konsep kemasan modern dan natural bersegel katup satu arah (one-way valve) yang menjaga kesegaran aroma biji kopi.",
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="3" y1="9" x2="21" y2="9"></line>
+                      <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                  )
+                }
+              ].map(item => (
+                <div 
+                  key={item.no} 
+                  className="bg-white p-8 rounded-2xl border border-aromika-goldlight/50 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <span className="text-3xl font-serif font-bold text-aromika-gold/40 group-hover:text-aromika-gold transition-colors">{item.no}</span>
+                      <div className="p-3 bg-aromika-beige rounded-xl text-aromika-roast group-hover:bg-aromika-roast group-hover:text-aromika-gold transition-colors">
+                        {item.icon}
+                      </div>
+                    </div>
+                    <h3 className="font-serif text-xl font-bold text-aromika-roast mb-3">{item.title}</h3>
+                    <p className="text-xs text-aromika-dark/70 leading-relaxed">{item.desc}</p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-aromika-beige flex items-center text-xs font-bold text-aromika-gold">
+                    <span>Terjamin Mutu</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ========================================================= */}
+          {/* SECTION: PERBANDINGAN ARABIKA VS ROBUSTA */}
+          {/* ========================================================= */}
+          <section id="duo-karakter" className="bg-aromika-beige py-20 border-y border-aromika-goldlight">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                <span className="text-xs font-bold tracking-[0.2em] text-aromika-gold uppercase">Dua Karakter Berbeda</span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-aromika-roast">Arabika atau Robusta?</h2>
+                <p className="text-sm text-aromika-dark/70">
+                  Temukan profil rasa yang selaras dengan kepribadian dan momen minum kopi Anda setiap hari.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                {/* Kartu Arabika */}
+                <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-aromika-goldlight transition-all hover:shadow-2xl">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src="https://images.unsplash.com/photo-1518832553480-cd0e625ed3e6?q=80&w=800&auto=format&fit=crop" 
+                      alt="Arabika Coffee" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-aromika-roast/90 to-transparent flex items-end p-6">
+                      <div>
+                        <span className="text-xs font-bold text-aromika-gold uppercase tracking-wider">Aroma Kaya & Halus</span>
+                        <h3 className="font-serif text-2xl font-bold text-aromika-cream">Karakter Arabika</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-8 space-y-4">
+                    <p className="text-sm text-aromika-dark/80 leading-relaxed">
+                      Ditanam di ketinggian di atas 1.200 mdpl. Menawarkan profil rasa kompleks dengan aroma harum bunga, kesegaran buah alami (citrus/peach), tingkat kafein sedang, dan keasaman yang elegan.
+                    </p>
+                    <div className="space-y-2 pt-2 border-t border-aromika-beige text-xs">
+                      <div className="flex justify-between font-semibold">
+                        <span>Aroma Semerbak:</span>
+                        <span className="text-aromika-gold">Tinggi (5/5)</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>Body / Ketebalan:</span>
+                        <span>Medium to Light</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>Paling Cocok Untuk:</span>
+                        <span>V60, Chemex, Japanese Drip, Americano</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={onGoToShop}
+                      className="w-full mt-4 py-3 border border-aromika-roast text-aromika-roast font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-aromika-roast hover:text-aromika-gold transition-colors"
+                    >
+                      Lihat Produk Arabika
+                    </button>
+                  </div>
+                </div>
+
+                {/* Kartu Robusta */}
+                <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-aromika-goldlight transition-all hover:shadow-2xl">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=800&auto=format&fit=crop" 
+                      alt="Robusta Coffee" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-aromika-dark/90 to-transparent flex items-end p-6">
+                      <div>
+                        <span className="text-xs font-bold text-aromika-gold uppercase tracking-wider">Tegas & Penuh Tenaga</span>
+                        <h3 className="font-serif text-2xl font-bold text-aromika-cream">Karakter Robusta</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-8 space-y-4">
+                    <p className="text-sm text-aromika-dark/80 leading-relaxed">
+                      Tumbuh subur di dataran sedang nusantara. Memiliki kandungan kafein hampir dua kali lipat lebih tinggi, body pekat, minim rasa asam, dengan dominasi rasa cokelat gelap, kacang, dan karamel tebal.
+                    </p>
+                    <div className="space-y-2 pt-2 border-t border-aromika-beige text-xs">
+                      <div className="flex justify-between font-semibold">
+                        <span>Aroma Semerbak:</span>
+                        <span className="text-aromika-gold">Kuat & Bold (4/5)</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>Body / Ketebalan:</span>
+                        <span>Heavy & Creamy Crema</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>Paling Cocok Untuk:</span>
+                        <span>Kopi Susu Gula Aren, Espresso, Tubruk, Vietnam Drip</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={onGoToShop}
+                      className="w-full mt-4 py-3 border border-aromika-roast text-aromika-roast font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-aromika-roast hover:text-aromika-gold transition-colors"
+                    >
+                      Lihat Produk Robusta
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+
+          {/* ========================================================= */}
+          {/* SECTION: BEST SELLER PRODUCTS */}
+          {/* ========================================================= */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-end mb-12">
+              <div>
+                <span className="text-xs font-bold tracking-[0.2em] text-aromika-gold uppercase">Koleksi Terlaris</span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-aromika-roast mt-1">Pilihan Best Seller</h2>
+              </div>
+              <button 
+                onClick={onGoToShop}
+                className="mt-4 sm:mt-0 text-xs font-bold tracking-wider uppercase text-aromika-roast hover:text-aromika-gold flex items-center space-x-2 transition-colors"
+              >
+                <span>Lihat Seluruh Katalog</span>
+                <span>→</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {bestSellers.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onSelectProduct={onSelectProduct}
+                  onAddToCart={onAddToCart}
+                  isFavorited={wishlist.includes(product.id)}
+                  onToggleWishlist={onToggleWishlist}
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* ========================================================= */}
+          {/* SECTION: TESTIMONI PELANGGAN */}
+          {/* ========================================================= */}
+          <section className="bg-aromika-dark text-aromika-cream py-20 relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+                <span className="text-xs font-bold tracking-[0.2em] text-aromika-gold uppercase">Ulasan Penikmat Kopi</span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-aromika-cream">Apa Kata Mereka?</h2>
+                <p className="text-xs text-aromika-goldlight/70">
+                  Kepuasan pelanggan dari kedai kopi artisan, barista rumahan, hingga penikmat kopi harian.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[
+                  {
+                    name: "Andi Wicaksono",
+                    role: "Home Brewer & Enthusiast",
+                    review: "Arabika Aceh Gayo dari Aromika benar-benar bersih dan manis. Notes peach dan aroma melatinya sangat kentara waktu diseduh V60 pada rasio 1:15. Wajib stok ulang!",
+                    beans: "Arabika Aceh Gayo"
+                  },
+                  {
+                    name: "Siti Nurhaliza",
+                    role: "Owner Coffee Shop Rumahan",
+                    review: "Robusta Dampit dan Lampungnya kami pakai untuk base Es Kopi Susu gula aren. Pelanggan suka sekali karena cremannya tebal dan rasa kopinya tetap dominan mantap.",
+                    beans: "Robusta Dampit Malang"
+                  },
+                  {
+                    name: "Dimas Anggara",
+                    role: "Peminum Kopi Harian",
+                    review: "Pengiriman cepat, kemasannya mewah pakai ziplock dan valve tebal. Biji kopi dipanggang fresh, waktu bungkus dibuka harumnya semerbak satu ruangan.",
+                    beans: "Arabika Bali Kintamani"
+                  }
+                ].map((t, i) => (
+                  <div key={i} className="bg-aromika-roast/80 border border-aromika-gold/30 p-8 rounded-2xl flex flex-col justify-between shadow-xl">
+                    <div className="space-y-4">
+                      {/* Bintang */}
+                      <div className="flex space-x-1 text-aromika-gold text-sm">
+                        {"★★★★★"}
+                      </div>
+                      <p className="text-xs italic text-aromika-goldlight/90 leading-relaxed font-light">
+                        "{t.review}"
+                      </p>
+                    </div>
+                    <div className="mt-6 pt-4 border-t border-aromika-gold/20 flex items-center justify-between">
+                      <div>
+                        <h4 className="font-serif font-bold text-sm text-aromika-gold">{t.name}</h4>
+                        <p className="text-[11px] text-aromika-goldlight/60">{t.role}</p>
+                      </div>
+                      <span className="text-[10px] bg-aromika-dark text-aromika-gold px-2.5 py-1 rounded-full border border-aromika-gold/30 font-medium">
+                        {t.beans}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ========================================================= */}
+          {/* SECTION: NEWSLETTER */}
+          {/* ========================================================= */}
+          <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-aromika-roast text-aromika-cream rounded-3xl p-8 sm:p-14 text-center border-2 border-aromika-gold shadow-2xl relative overflow-hidden">
+              <div className="relative z-10 max-w-2xl mx-auto space-y-4">
+                <span className="text-xs font-bold tracking-[0.25em] text-aromika-gold uppercase">Komunitas Aromika</span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold">Dapatkan Diskon 15% Pemesanan Pertama</h2>
+                <p className="text-xs sm:text-sm text-aromika-goldlight/80 font-light">
+                  Berlangganan kabar jadwal roasting terbaru, panduan menyeduh kopi manual brew, dan penawaran eksklusif setiap minggunya.
+                </p>
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    alert("Terima kasih telah bergabung! Kode diskon AROMIKA15 telah dikirimkan ke email Anda.");
+                  }}
+                  className="flex flex-col sm:flex-row gap-3 pt-4 max-w-md mx-auto"
+                >
+                  <input 
+                    type="email" 
+                    required 
+                    placeholder="Masukkan alamat email Anda..." 
+                    className="flex-1 px-4 py-3.5 rounded-xl bg-aromika-cream text-aromika-dark text-xs focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                  />
+                  <button 
+                    type="submit" 
+                    className="px-6 py-3.5 bg-aromika-gold text-aromika-dark font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-aromika-goldlight transition-all"
+                  >
+                    Langganan
+                  </button>
+                </form>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: PRODUCT CARD
+    // =========================================================
+    function ProductCard({ product, onSelectProduct, onAddToCart, isFavorited, onToggleWishlist }) {
+      return (
+        <div className="bg-white rounded-2xl overflow-hidden border border-aromika-goldlight/60 shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col group">
+          {/* Gambar Produk & Badges */}
+          <div className="relative h-64 overflow-hidden bg-aromika-beige cursor-pointer" onClick={() => onSelectProduct(product)}>
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            />
+            {/* Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+            {/* Badges */}
+            <div className="absolute top-3 left-3 flex flex-col space-y-1.5">
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md ${
+                product.category === 'Arabika' 
+                  ? 'bg-aromika-roast text-aromika-gold border border-aromika-gold' 
+                  : 'bg-aromika-mocha text-white'
+              }`}>
+                {product.category}
+              </span>
+              {product.isBestSeller && (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-aromika-gold text-aromika-dark shadow-md">
+                  Best Seller
+                </span>
+              )}
+            </div>
+
+            {/* Tombol Wishlist */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleWishlist(product.id);
+              }}
+              className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-aromika-roast hover:text-red-500 transition-colors shadow-md"
+              title="Favorit"
+            >
+              <svg className="w-4 h-4" fill={isFavorited ? "#C5A880" : "none"} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+          </div>
+
+          {/* Konten Card */}
+          <div className="p-6 flex-1 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-aromika-dark/60">
+                <span className="flex items-center space-x-1">
+                  <span className="text-amber-500">★</span>
+                  <span className="font-semibold text-aromika-dark">{product.rating}</span>
+                  <span>({product.reviewsCount})</span>
+                </span>
+                <span className="text-emerald-700 font-medium">Stok: {product.stock} pcs</span>
+              </div>
+
+              <h3 
+                onClick={() => onSelectProduct(product)}
+                className="font-serif text-lg font-bold text-aromika-roast hover:text-aromika-gold transition-colors cursor-pointer leading-tight"
+              >
+                {product.name}
+              </h3>
+
+              {/* Flavor Notes Badges */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {product.flavorNotes.slice(0, 3).map((note, idx) => (
+                  <span key={idx} className="text-[10px] bg-aromika-beige text-aromika-dark px-2 py-0.5 rounded-md font-medium">
+                    {note}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Pricing & Actions */}
+            <div className="pt-6 mt-4 border-t border-aromika-goldlight/40 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] text-aromika-dark/60 block">Mulai dari (100g):</span>
+                <span className="font-serif font-bold text-base text-aromika-roast">
+                  {formatRupiah(product.basePrice)}
+                </span>
+              </div>
+
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => onSelectProduct(product)}
+                  className="px-3 py-2 text-xs font-bold text-aromika-roast border border-aromika-roast rounded-lg hover:bg-aromika-beige transition-colors"
+                  title="Detail Produk"
+                >
+                  Detail
+                </button>
+                <button
+                  onClick={() => onAddToCart(product, "250 gram", "Biji Utuh", 1)}
+                  className="px-3 py-2 text-xs font-bold bg-aromika-roast text-aromika-gold rounded-lg hover:bg-aromika-mocha transition-all flex items-center space-x-1"
+                  title="Tambah Cepat (250g Biji Utuh)"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>Beli</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: SHOP VIEW (KATALOG, SEARCH, FILTER & SORT)
+    // =========================================================
+    function ShopView({ 
+      products, 
+      onSelectProduct, 
+      onAddToCart, 
+      searchQuery, 
+      setSearchQuery, 
+      selectedCategory, 
+      setSelectedCategory, 
+      sortBy, 
+      setSortBy,
+      wishlist,
+      onToggleWishlist 
+    }) {
+      // Filtering and Sorting Logic
+      const filteredProducts = useMemo(() => {
+        let result = [...products];
+
+        // 1. Search Filter
+        if (searchQuery.trim() !== "") {
+          const q = searchQuery.toLowerCase();
+          result = result.filter(p => 
+            p.name.toLowerCase().includes(q) ||
+            p.category.toLowerCase().includes(q) ||
+            p.flavorNotes.some(fn => fn.toLowerCase().includes(q))
+          );
+        }
+
+        // 2. Category Filter
+        if (selectedCategory !== "Semua") {
+          result = result.filter(p => p.category === selectedCategory);
+        }
+
+        // 3. Sorting
+        if (sortBy === "price-asc") {
+          result.sort((a, b) => a.basePrice - b.basePrice);
+        } else if (sortBy === "price-desc") {
+          result.sort((a, b) => b.basePrice - a.basePrice);
+        } else if (sortBy === "bestseller") {
+          result.sort((a, b) => (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0));
+        }
+
+        return result;
+      }, [products, searchQuery, selectedCategory, sortBy]);
+
+      return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+          
+          {/* Header Toko */}
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-bold tracking-[0.25em] text-aromika-gold uppercase">Katalog Biji Kopi</span>
+            <h1 className="font-serif text-3xl sm:text-5xl font-bold text-aromika-roast">Koleksi Pilihan Nusantara</h1>
+            <p className="text-xs sm:text-sm text-aromika-dark/70">
+              Temukan profil aroma dan kekuatan rasa biji kopi Arabika serta Robusta kualitas specialty untuk rutinitas harian Anda.
+            </p>
+          </div>
+
+          {/* Filter & Search Bar Controller */}
+          <div className="bg-white p-6 rounded-2xl border border-aromika-goldlight shadow-sm space-y-4 md:space-y-0 md:flex md:items-center md:justify-between gap-4">
+            
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-md">
+              <input
+                type="text"
+                placeholder="Cari kopi (misal: Gayo, Robusta, Floral)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-aromika-beige rounded-xl text-xs text-aromika-dark placeholder-aromika-dark/40 focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+              />
+              <svg className="w-4 h-4 absolute left-3.5 top-3.5 text-aromika-dark/50" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-3 text-xs text-aromika-dark/50 hover:text-aromika-dark"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Category Toggle Tabs */}
+            <div className="flex items-center space-x-2">
+              {["Semua", "Arabika", "Robusta"].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    selectedCategory === cat
+                      ? "bg-aromika-roast text-aromika-gold shadow-md"
+                      : "bg-aromika-beige text-aromika-dark hover:bg-aromika-goldlight"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Sorting Dropdown */}
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-aromika-dark/60 hidden sm:inline">Urutkan:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-aromika-beige text-aromika-dark text-xs font-semibold px-4 py-2.5 rounded-xl border-none focus:ring-2 focus:ring-aromika-gold focus:outline-none cursor-pointer"
+              >
+                <option value="default">Rekomendasi Utama</option>
+                <option value="bestseller">Paling Laris (Best Seller)</option>
+                <option value="price-asc">Harga: Termurah ke Termahal</option>
+                <option value="price-desc">Harga: Termahal ke Termurah</option>
+              </select>
+            </div>
+
+          </div>
+
+          {/* Product Grid Results */}
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-aromika-goldlight space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-aromika-beige flex items-center justify-center text-aromika-gold">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+              <h3 className="font-serif text-xl font-bold text-aromika-roast">Kopi Tidak Ditemukan</h3>
+              <p className="text-xs text-aromika-dark/60 max-w-sm mx-auto">
+                Maaf, tidak ada produk yang cocok dengan kata kunci pencarian Anda. Cobalah kata kunci lain seperti "Arabika" atau "Lampung".
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("Semua");
+                }}
+                className="px-5 py-2 bg-aromika-roast text-aromika-gold text-xs font-bold rounded-lg uppercase"
+              >
+                Reset Filter
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredProducts.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onSelectProduct={onSelectProduct}
+                  onAddToCart={onAddToCart}
+                  isFavorited={wishlist.includes(product.id)}
+                  onToggleWishlist={onToggleWishlist}
+                />
+              ))}
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: PRODUCT DETAIL MODAL (LENGKAP SPESIFIKASI)
+    // =========================================================
+    function ProductDetailModal({ product, onClose, onAddToCart, isFavorited, onToggleWishlist }) {
+      const [selectedWeight, setSelectedWeight] = useState("250 gram");
+      const [selectedGrind, setSelectedGrind] = useState("Biji Utuh");
+      const [quantity, setQuantity] = useState(1);
+
+      const calculatedPrice = useMemo(() => {
+        return Math.round(product.basePrice * (WEIGHT_MULTIPLIERS[selectedWeight] || 1));
+      }, [product.basePrice, selectedWeight]);
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aromika-cream text-aromika-dark rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl border border-aromika-gold relative">
+            
+            {/* Tombol Tutup */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/80 text-aromika-dark hover:bg-aromika-roast hover:text-aromika-gold flex items-center justify-center transition-colors shadow-md"
+            >
+              ✕
+            </button>
+
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              
+              {/* Gambar Produk Kiri */}
+              <div className="relative h-80 md:h-full bg-aromika-beige">
+                <img 
+                  src={product.image} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <span className="bg-aromika-roast text-aromika-gold border border-aromika-gold px-3 py-1 rounded-full text-xs font-bold uppercase">
+                    {product.category}
+                  </span>
+                  {product.isBestSeller && (
+                    <span className="bg-aromika-gold text-aromika-dark px-3 py-1 rounded-full text-xs font-bold uppercase">
+                      Best Seller
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Konten Kanan */}
+              <div className="p-8 space-y-6 max-h-[85vh] overflow-y-auto">
+                <div>
+                  <div className="flex justify-between items-center text-xs text-aromika-dark/60 mb-1">
+                    <span>★ {product.rating} ({product.reviewsCount} Ulasan Pelanggan)</span>
+                    <span className="text-emerald-700 font-semibold">Tersedia: {product.stock} pcs</span>
+                  </div>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-aromika-roast">{product.name}</h2>
+                  <div className="text-2xl font-serif font-bold text-aromika-mocha mt-2">
+                    {formatRupiah(calculatedPrice)}
+                  </div>
+                </div>
+
+                <p className="text-xs text-aromika-dark/80 leading-relaxed">
+                  {product.description}
+                </p>
+
+                {/* Profil Karakter Kopi */}
+                <div className="bg-white p-4 rounded-xl border border-aromika-goldlight space-y-2 text-xs">
+                  <h4 className="font-bold text-aromika-roast uppercase tracking-wider text-[11px]">Karakteristik Seduhan:</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <span className="text-aromika-dark/60 block">Aroma:</span>
+                      <span className="font-semibold text-aromika-gold">{"★".repeat(Math.round(product.aroma))} ({product.aroma}/5)</span>
+                    </div>
+                    <div>
+                      <span className="text-aromika-dark/60 block">Keasaman (Acidity):</span>
+                      <span className="font-semibold text-aromika-roast">{product.acidity}</span>
+                    </div>
+                    <div>
+                      <span className="text-aromika-dark/60 block">Ketebalan (Body):</span>
+                      <span className="font-semibold text-aromika-roast">{product.body}</span>
+                    </div>
+                    <div>
+                      <span className="text-aromika-dark/60 block">Notes Rasa:</span>
+                      <span className="font-semibold text-aromika-roast">{product.flavorNotes.join(", ")}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pilihan Berat Kemasan */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-aromika-roast uppercase tracking-wider block">
+                    Pilih Ukuran Kemasan:
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["100 gram", "250 gram", "500 gram"].map(size => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedWeight(size)}
+                        className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${
+                          selectedWeight === size
+                            ? "bg-aromika-roast text-aromika-gold border-aromika-gold shadow-md"
+                            : "bg-white text-aromika-dark border-aromika-goldlight hover:bg-aromika-beige"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Pilihan Gilingan */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-aromika-roast uppercase tracking-wider block">
+                    Bentuk / Tingkat Gilingan:
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: "Biji Utuh", label: "Biji Utuh (Whole Bean)" },
+                      { id: "Giling Kasar", label: "Kasar (Cold Brew/French Press)" },
+                      { id: "Giling Medium", label: "Medium (V60/Filter)" },
+                      { id: "Giling Halus", label: "Halus (Espresso/Tubruk)" },
+                    ].map(g => (
+                      <button
+                        key={g.id}
+                        onClick={() => setSelectedGrind(g.id)}
+                        className={`py-2 px-2.5 text-[11px] font-semibold rounded-lg border text-left transition-all ${
+                          selectedGrind === g.id
+                            ? "bg-aromika-roast text-aromika-gold border-aromika-gold"
+                            : "bg-white text-aromika-dark border-aromika-goldlight hover:bg-aromika-beige"
+                        }`}
+                      >
+                        {g.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Kuantitas & Tombol Tambah */}
+                <div className="pt-4 border-t border-aromika-goldlight/60 flex items-center space-x-4">
+                  {/* Selector Qty */}
+                  <div className="flex items-center border border-aromika-goldlight rounded-xl bg-white p-1">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-8 h-8 rounded-lg bg-aromika-beige text-aromika-dark font-bold text-sm flex items-center justify-center hover:bg-aromika-goldlight"
+                    >
+                      -
+                    </button>
+                    <span className="w-10 text-center font-bold text-xs">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-8 h-8 rounded-lg bg-aromika-beige text-aromika-dark font-bold text-sm flex items-center justify-center hover:bg-aromika-goldlight"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      onAddToCart(product, selectedWeight, selectedGrind, quantity);
+                      onClose();
+                    }}
+                    className="flex-1 py-3.5 bg-aromika-roast text-aromika-gold border border-aromika-gold rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-aromika-mocha transition-all shadow-xl flex items-center justify-center space-x-2"
+                  >
+                    <span>Tambah ke Keranjang</span>
+                    <span>•</span>
+                    <span>{formatRupiah(calculatedPrice * quantity)}</span>
+                  </button>
+
+                  <button
+                    onClick={() => onToggleWishlist(product.id)}
+                    className="p-3 bg-white border border-aromika-goldlight rounded-xl text-aromika-roast hover:text-red-500 transition-colors"
+                    title="Favorit"
+                  >
+                    <svg className="w-5 h-5" fill={isFavorited ? "#C5A880" : "none"} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: ABOUT US VIEW
+    // =========================================================
+    function AboutView({ onExploreShop }) {
+      return (
+        <div className="space-y-20 py-12">
+          
+          {/* Header Profil */}
+          <div className="max-w-4xl mx-auto px-4 text-center space-y-4">
+            <span className="text-xs font-bold tracking-[0.25em] text-aromika-gold uppercase">Tentang Kami</span>
+            <h1 className="font-serif text-3xl sm:text-5xl font-bold text-aromika-roast">Kisah Aromika Coffee</h1>
+            <p className="text-sm text-aromika-dark/70 max-w-2xl mx-auto leading-relaxed">
+              Lahir dari apresiasi mendalam terhadap keragaman karakter biji kopi di tanah air, dari puncak vulkanis dataran tinggi Gayo hingga pesisir subur tanah Lampung.
+            </p>
+          </div>
+
+          {/* Banner Cerita */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-aromika-gold">
+                <img 
+                  src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=800&auto=format&fit=crop" 
+                  alt="Roasting Process" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="space-y-6">
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-aromika-roast">
+                  Filosofi Nama "AROMIKA"
+                </h2>
+                <p className="text-xs sm:text-sm text-aromika-dark/80 leading-relaxed">
+                  Nama <strong>AROMIKA</strong> merupakan peleburan dari dua kata esensial dalam seni menyeduh kopi: <strong>AROMA</strong> (keharuman khas yang memikat indera penciuman) dan <strong>KARAKTER</strong> (identitas cita rasa unik yang tertinggal di indera pengecap).
+                </p>
+                <p className="text-xs sm:text-sm text-aromika-dark/80 leading-relaxed">
+                  Kami meyakini bahwa kopi bukan sekadar minuman penghalau kantuk, melainkan medium penghubung antar manusia dan cerminan kekayaan tanah nusantara.
+                </p>
+
+                {/* Visi & Misi Ringkas */}
+                <div className="space-y-3 pt-4 border-t border-aromika-goldlight">
+                  <div className="flex space-x-3">
+                    <span className="w-6 h-6 rounded-full bg-aromika-roast text-aromika-gold font-bold text-xs flex items-center justify-center flex-shrink-0">✓</span>
+                    <div>
+                      <h4 className="text-xs font-bold text-aromika-roast">Visi Kami</h4>
+                      <p className="text-[11px] text-aromika-dark/70">Menjadi artisan coffee roastery terdepan yang mendemokratisasi kopi Arabika & Robusta premium dengan standar kelas dunia.</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3">
+                    <span className="w-6 h-6 rounded-full bg-aromika-roast text-aromika-gold font-bold text-xs flex items-center justify-center flex-shrink-0">✓</span>
+                    <div>
+                      <h4 className="text-xs font-bold text-aromika-roast">Misi Kami</h4>
+                      <p className="text-[11px] text-aromika-dark/70">Bekerja sama langsung dengan petani lokal, menerapkan proses roasting presisi, dan menjaga kesegaran produk hingga ke cangkir Anda.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={onExploreShop}
+                  className="px-6 py-3 bg-aromika-roast text-aromika-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-aromika-mocha transition-all shadow-lg"
+                >
+                  Jelajahi Pilihan Kopi Kami
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: CONTACT VIEW
+    // =========================================================
+    function ContactView({ showToast }) {
+      const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+      });
+      const [submitted, setSubmitted] = useState(false);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!formData.name || !formData.email || !formData.message) {
+          alert("Mohon lengkapi seluruh formulir wajib.");
+          return;
+        }
+        setSubmitted(true);
+        showToast("Pesan Anda berhasil dikirim! Tim Aromika akan membalas segera.");
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      };
+
+      return (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12">
+          
+          <div className="text-center max-w-xl mx-auto space-y-3">
+            <span className="text-xs font-bold tracking-[0.25em] text-aromika-gold uppercase">Layanan Pelanggan</span>
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold text-aromika-roast">Hubungi Aromika Coffee</h1>
+            <p className="text-xs sm:text-sm text-aromika-dark/70">
+              Ada pertanyaan seputar rekomendasi biji kopi, pesanan korporat, atau kemitraan kedai kopi? Kami siap melayani Anda.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Info Kontak Kiri */}
+            <div className="bg-aromika-roast text-aromika-cream p-8 rounded-3xl border border-aromika-gold shadow-xl space-y-8">
+              <div>
+                <h3 className="font-serif text-2xl font-bold text-aromika-gold mb-2">Informasi Langsung</h3>
+                <p className="text-xs text-aromika-goldlight/70 leading-relaxed">
+                  Layanan pesan cepat melalui WhatsApp Customer Service kami aktif setiap hari pukul 08:00 - 21:00 WIB.
+                </p>
+              </div>
+
+              <div className="space-y-4 text-xs">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg bg-aromika-mocha text-aromika-gold flex items-center justify-center font-bold">WA</div>
+                  <div>
+                    <span className="text-aromika-goldlight/60 block">WhatsApp Resmi:</span>
+                    <a href="https://wa.me/082119253416" target="_blank" rel="noreferrer" className="font-bold text-aromika-cream hover:text-aromika-gold">
+                      082119253416
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg bg-aromika-mocha text-aromika-gold flex items-center justify-center font-bold">@</div>
+                  <div>
+                    <span className="text-aromika-goldlight/60 block">Email Roastery:</span>
+                    <span className="font-bold text-aromika-cream">aromika255@gmail.com</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg bg-aromika-mocha text-aromika-gold flex items-center justify-center font-bold">IG</div>
+                  <div>
+                    <span className="text-aromika-goldlight/60 block">Instagram:</span>
+                    <span className="font-bold text-aromika-cream">Aromikacoffe.id</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-aromika-dark rounded-xl border border-aromika-gold/30">
+                <p className="text-[11px] text-aromika-goldlight/80 italic">
+                  "Kualitas roasting kopi terbaik lahir dari komunikasi yang jujur dan hangat."
+                </p>
+              </div>
+            </div>
+
+            {/* Form Kanan */}
+            <div className="md:col-span-2 bg-white p-8 rounded-3xl border border-aromika-goldlight shadow-sm">
+              {submitted ? (
+                <div className="text-center py-12 space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl font-bold">
+                    ✓
+                  </div>
+                  <h3 className="font-serif text-2xl font-bold text-aromika-roast">Pesan Terkirim!</h3>
+                  <p className="text-xs text-aromika-dark/70 max-w-md mx-auto">
+                    Terima kasih telah menghubungi Aromika Coffee. Tim roaster & customer care kami akan membalas pesan Anda dalam kurun waktu 1x24 jam kerja.
+                  </p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="px-6 py-2.5 bg-aromika-roast text-aromika-gold text-xs font-bold uppercase rounded-xl"
+                  >
+                    Kirim Pesan Lain
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-aromika-roast uppercase block mb-1">Nama Lengkap *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Contoh: Budi Santoso"
+                        className="w-full px-4 py-2.5 rounded-xl bg-aromika-beige text-xs text-aromika-dark focus:ring-2 focus:ring-aromika-gold focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-aromika-roast uppercase block mb-1">Alamat Email *</label>
+                      <input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="budi@email.com"
+                        className="w-full px-4 py-2.5 rounded-xl bg-aromika-beige text-xs text-aromika-dark focus:ring-2 focus:ring-aromika-gold focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-aromika-roast uppercase block mb-1">Subjek / Keperluan</label>
+                    <input
+                      type="text"
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      placeholder="Pertanyaan Produk / Kerjasama B2B / Tanya Stok"
+                      className="w-full px-4 py-2.5 rounded-xl bg-aromika-beige text-xs text-aromika-dark focus:ring-2 focus:ring-aromika-gold focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-aromika-roast uppercase block mb-1">Pesan Anda *</label>
+                    <textarea
+                      rows="4"
+                      required
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Tuliskan pesan atau pertanyaan Anda di sini..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-aromika-beige text-xs text-aromika-dark focus:ring-2 focus:ring-aromika-gold focus:outline-none"
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3.5 bg-aromika-roast text-aromika-gold border border-aromika-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-aromika-mocha transition-all shadow-md"
+                  >
+                    Kirim Pesan Sekarang
+                  </button>
+                </form>
+              )}
+            </div>
+
+          </div>
+
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: CHECKOUT MODAL
+    // =========================================================
+    function CheckoutModal({ cart, cartSubtotal, onClose, user, onSuccessOrder }) {
+      const [customerName, setCustomerName] = useState(user ? user.name : "");
+      const [phone, setPhone] = useState(user ? user.phone || "" : "");
+      const [email, setEmail] = useState(user ? user.email : "");
+      const [address, setAddress] = useState("");
+      const [courier, setCourier] = useState("JNE Reguler (Rp 18.000)");
+      const [paymentMethod, setPaymentMethod] = useState("Transfer Bank BCA");
+
+      const shippingCost = useMemo(() => {
+        if (courier.includes("SiCepat")) return 22000;
+        if (courier.includes("J&T")) return 19000;
+        return 18000; // JNE
+      }, [courier]);
+
+      const grandTotal = cartSubtotal + shippingCost;
+
+      const handleOrderSubmit = (e) => {
+        e.preventDefault();
+        if (!customerName || !phone || !email || !address) {
+          alert("Mohon isi seluruh data pengiriman dengan lengkap!");
+          return;
+        }
+
+        const newOrder = {
+          orderId: `ARMK-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+          date: new Date().toLocaleString("id-ID"),
+          customerName,
+          phone,
+          email,
+          address,
+          shipping: courier,
+          paymentMethod,
+          items: cart.map(item => ({
+            name: item.name,
+            weight: item.weight,
+            grind: item.grind,
+            qty: item.qty,
+            price: item.price
+          })),
+          total: grandTotal,
+          status: "Menunggu Pembayaran"
+        };
+
+        onSuccessOrder(newOrder);
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aromika-cream text-aromika-dark rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-aromika-gold relative">
+            
+            {/* Modal Header */}
+            <div className="p-6 bg-aromika-roast text-aromika-cream flex items-center justify-between border-b border-aromika-gold">
+              <div>
+                <span className="text-[10px] text-aromika-gold tracking-widest uppercase font-semibold">Simulasi Pemesanan</span>
+                <h3 className="font-serif text-2xl font-bold">Formulir Checkout</h3>
+              </div>
+              <button onClick={onClose} className="text-aromika-gold hover:text-white p-2">✕</button>
+            </div>
+
+            <form onSubmit={handleOrderSubmit} className="p-6 sm:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+              
+              {/* Bagian 1: Identitas Pemesan */}
+              <div className="space-y-4">
+                <h4 className="font-serif text-lg font-bold text-aromika-roast border-b border-aromika-goldlight pb-2">
+                  1. Informasi Pengiriman
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="font-bold block mb-1">Nama Lengkap Penerima *</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={customerName} 
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      placeholder="Nama lengkap Anda"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold block mb-1">Nomor WhatsApp *</label>
+                    <input 
+                      type="tel" 
+                      required 
+                      value={phone} 
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="0812xxxxxxxx"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-xs">
+                  <label className="font-bold block mb-1">Alamat Email *</label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email@anda.com"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                  />
+                </div>
+
+                <div className="text-xs">
+                  <label className="font-bold block mb-1">Alamat Lengkap Tujuan Pengiriman *</label>
+                  <textarea 
+                    rows="2" 
+                    required 
+                    value={address} 
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Nama Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan, Kota, Kode Pos"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                  ></textarea>
+                </div>
+              </div>
+
+              {/* Bagian 2: Kurir & Pembayaran */}
+              <div className="space-y-4">
+                <h4 className="font-serif text-lg font-bold text-aromika-roast border-b border-aromika-goldlight pb-2">
+                  2. Metode Pengiriman & Pembayaran
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="font-bold block mb-1">Pilihan Ekspedisi:</label>
+                    <select
+                      value={courier}
+                      onChange={(e) => setCourier(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:ring-2 focus:ring-aromika-gold focus:outline-none"
+                    >
+                      <option value="JNE Reguler (Rp 18.000)">JNE Reguler (2-3 Hari) — Rp 18.000</option>
+                      <option value="SiCepat BEST (Rp 22.000)">SiCepat BEST (1-2 Hari) — Rp 22.000</option>
+                      <option value="J&T Express (Rp 19.000)">J&T Express (2-3 Hari) — Rp 19.000</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="font-bold block mb-1">Metode Pembayaran:</label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:ring-2 focus:ring-aromika-gold focus:outline-none"
+                    >
+                      <option value="Transfer Bank BCA">Transfer Bank BCA (Virtual Account)</option>
+                      <option value="Transfer Bank Mandiri">Transfer Bank Mandiri</option>
+                      <option value="QRIS / GoPay / ShopeePay">QRIS / GoPay / ShopeePay Instant</option>
+                      <option value="COD (Bayar di Tempat)">COD (Bayar Tunai di Tempat)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bagian 3: Ringkasan Pesanan */}
+              <div className="bg-white p-5 rounded-2xl border border-aromika-goldlight space-y-3">
+                <h5 className="font-serif font-bold text-sm text-aromika-roast">Ringkasan Pembayaran</h5>
+                <div className="space-y-1.5 text-xs text-aromika-dark/70">
+                  <div className="flex justify-between">
+                    <span>Subtotal Produk ({cart.length} item):</span>
+                    <span className="font-semibold text-aromika-dark">{formatRupiah(cartSubtotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Biaya Pengiriman ({courier.split("(")[0]}):</span>
+                    <span className="font-semibold text-aromika-dark">{formatRupiah(shippingCost)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold text-aromika-roast pt-2 border-t border-aromika-beige">
+                    <span>Total Pembayaran:</span>
+                    <span className="text-base text-aromika-mocha">{formatRupiah(grandTotal)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tombol Buat Pesanan */}
+              <div className="flex justify-end space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-5 py-3 text-xs font-bold text-aromika-dark rounded-xl hover:bg-aromika-beige"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-8 py-3.5 bg-aromika-roast text-aromika-gold border border-aromika-gold rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-aromika-mocha transition-all shadow-xl"
+                >
+                  Buat Pesanan Sekarang
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: ORDER SUCCESS MODAL (INVOICE SIMULASI)
+    // =========================================================
+    function OrderSuccessModal({ order, onClose }) {
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white text-aromika-dark rounded-3xl max-w-lg w-full p-8 shadow-2xl border-2 border-aromika-gold space-y-6 relative text-center">
+            
+            <div className="w-16 h-16 mx-auto rounded-full bg-aromika-beige text-aromika-gold flex items-center justify-center text-3xl font-bold border border-aromika-gold">
+              ✓
+            </div>
+
+            <div>
+              <span className="text-[10px] font-bold tracking-[0.25em] text-aromika-gold uppercase">Pesanan Diterima</span>
+              <h2 className="font-serif text-2xl font-bold text-aromika-roast mt-1">Terima Kasih Atas Pesanan Anda!</h2>
+              <p className="text-xs text-aromika-dark/60 mt-1">
+                Nomor Pesanan: <strong className="text-aromika-mocha font-mono text-sm">{order.orderId}</strong>
+              </p>
+            </div>
+
+            {/* Status Badge */}
+            <div className="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold tracking-wide">
+              Status: {order.status}
+            </div>
+
+            {/* Rincian Ringkas */}
+            <div className="bg-aromika-cream p-4 rounded-xl text-left text-xs space-y-2 border border-aromika-goldlight">
+              <div className="flex justify-between">
+                <span className="text-aromika-dark/60">Penerima:</span>
+                <span className="font-semibold text-aromika-dark">{order.customerName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-aromika-dark/60">WhatsApp:</span>
+                <span className="font-semibold text-aromika-dark">{order.phone}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-aromika-dark/60">Metode Bayar:</span>
+                <span className="font-semibold text-aromika-dark">{order.paymentMethod}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-aromika-goldlight text-sm font-bold text-aromika-roast">
+                <span>Total Ditagihkan:</span>
+                <span className="text-aromika-mocha">{formatRupiah(order.total)}</span>
+              </div>
+            </div>
+
+            {/* Instruksi Simulasi */}
+            <p className="text-[11px] text-aromika-dark/60 italic leading-relaxed">
+              *Ini adalah simulasi pemesanan tugas kuliah. Data pesanan Anda telah tersimpan secara lokal dan dapat diperiksa serta dikelola melalui tab <strong>Admin Panel</strong>.
+            </p>
+
+            <button
+              onClick={onClose}
+              className="w-full py-3.5 bg-aromika-roast text-aromika-gold font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-aromika-mocha transition-all shadow-md"
+            >
+              Kembali ke Toko
+            </button>
+
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: AUTH MODAL (LOGIN & REGISTER SIMULASI)
+    // =========================================================
+    function AuthModal({ user, setUser, onClose, showToast }) {
+      const [isRegister, setIsRegister] = useState(false);
+      const [email, setEmail] = useState("");
+      const [password, setPassword] = useState("");
+      const [name, setName] = useState("");
+
+      const handleAuth = (e) => {
+        e.preventDefault();
+        if (!email || !password) {
+          alert("Lengkapi email dan password.");
+          return;
+        }
+
+        if (isRegister) {
+          if (!name) {
+            alert("Nama wajib diisi.");
+            return;
+          }
+          const newUser = { name, email, role: "customer" };
+          setUser(newUser);
+          showToast(`Akun berhasil dibuat. Selamat datang, ${name}!`);
+        } else {
+          // Simulasi login sukses
+          const loggedName = email.split("@")[0];
+          setUser({ name: loggedName.charAt(0).toUpperCase() + loggedName.slice(1), email, role: "customer" });
+          showToast("Berhasil masuk akun Aromika!");
+        }
+        onClose();
+      };
+
+      const handleLogout = () => {
+        setUser(null);
+        showToast("Anda telah keluar dari akun.");
+        onClose();
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aromika-cream text-aromika-dark rounded-3xl max-w-md w-full p-8 shadow-2xl border border-aromika-gold relative">
+            <button onClick={onClose} className="absolute top-4 right-4 text-aromika-dark p-2 hover:text-red-500">✕</button>
+
+            {user ? (
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 mx-auto rounded-full bg-aromika-roast text-aromika-gold font-bold text-2xl flex items-center justify-center border-2 border-aromika-gold">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="font-serif text-xl font-bold text-aromika-roast">{user.name}</h3>
+                  <p className="text-xs text-aromika-dark/60">{user.email}</p>
+                  <span className="inline-block mt-2 px-3 py-1 bg-aromika-gold/30 text-aromika-dark text-[10px] font-bold rounded-full uppercase">
+                    Status: Pelanggan Setia
+                  </span>
+                </div>
+                <div className="pt-4 border-t border-aromika-goldlight">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-red-700 transition-colors"
+                  >
+                    Logout / Keluar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <span className="text-[10px] font-bold tracking-[0.25em] text-aromika-gold uppercase">Akun Pengguna</span>
+                  <h3 className="font-serif text-2xl font-bold text-aromika-roast mt-1">
+                    {isRegister ? "Daftar Akun Baru" : "Masuk ke Akun Anda"}
+                  </h3>
+                </div>
+
+                <form onSubmit={handleAuth} className="space-y-4 text-xs">
+                  {isRegister && (
+                    <div>
+                      <label className="font-bold block mb-1">Nama Lengkap *</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Budi Santoso"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="font-bold block mb-1">Alamat Email *</label>
+                    <input 
+                      type="email" 
+                      required 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="email@anda.com"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold block mb-1">Kata Sandi (Password) *</label>
+                    <input 
+                      type="password" 
+                      required 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-aromika-roast text-aromika-gold border border-aromika-gold rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-aromika-mocha transition-all shadow-md mt-2"
+                  >
+                    {isRegister ? "Daftarkan Akun" : "Masuk Sekarang"}
+                  </button>
+                </form>
+
+                <div className="text-center pt-2 text-xs">
+                  <button
+                    onClick={() => setIsRegister(!isRegister)}
+                    className="text-aromika-mocha font-bold hover:underline"
+                  >
+                    {isRegister ? "Sudah punya akun? Masuk di sini" : "Belum punya akun? Buat akun sekarang"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================
+    // KOMPONEN: ADMIN DASHBOARD (CRUD PRODUK & KELOLA ORDER)
+    // =========================================================
+    function AdminDashboard({ products, setProducts, orders, setOrders, showToast }) {
+      const [adminTab, setAdminTab] = useState("products"); // 'products' | 'orders'
+      const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+      const [editingProduct, setEditingProduct] = useState(null);
+
+      // Total simulasi pendapatan
+      const totalSales = orders.reduce((sum, o) => sum + o.total, 0);
+
+      // Form State untuk Tambah / Edit Produk
+      const [formData, setFormData] = useState({
+        name: "",
+        category: "Arabika",
+        basePrice: 75000,
+        stock: 20,
+        aroma: 5,
+        acidity: "Medium",
+        body: "Full",
+        flavorNotes: "Cokelat, Buah, Karamel",
+        image: "https://images.unsplash.com/photo-1587734195503-904fca47e0e9?q=80&w=800&auto=format&fit=crop",
+        description: "Biji kopi artisan pilihan bermutu tinggi dipetik matang optimal."
+      });
+
+      // Buka modal edit
+      const handleOpenEdit = (p) => {
+        setEditingProduct(p);
+        setFormData({
+          name: p.name,
+          category: p.category,
+          basePrice: p.basePrice,
+          stock: p.stock,
+          aroma: p.aroma,
+          acidity: p.acidity,
+          body: p.body,
+          flavorNotes: p.flavorNotes.join(", "),
+          image: p.image,
+          description: p.description
+        });
+        setIsAddModalOpen(true);
+      };
+
+      // Simpan Produk (Tambah atau Edit)
+      const handleSaveProduct = (e) => {
+        e.preventDefault();
+        const notesArr = formData.flavorNotes.split(",").map(n => n.trim()).filter(Boolean);
+
+        if (editingProduct) {
+          // Mode Edit
+          setProducts(prev => prev.map(p => {
+            if (p.id === editingProduct.id) {
+              return {
+                ...p,
+                ...formData,
+                basePrice: Number(formData.basePrice),
+                stock: Number(formData.stock),
+                aroma: Number(formData.aroma),
+                flavorNotes: notesArr
+              };
+            }
+            return p;
+          }));
+          showToast(`Produk "${formData.name}" berhasil diperbarui!`);
+        } else {
+          // Mode Tambah Baru
+          const newProduct = {
+            id: `prod-${Date.now()}`,
+            ...formData,
+            basePrice: Number(formData.basePrice),
+            stock: Number(formData.stock),
+            aroma: Number(formData.aroma),
+            rating: 4.8,
+            reviewsCount: 1,
+            isBestSeller: false,
+            flavorNotes: notesArr
+          };
+          setProducts(prev => [newProduct, ...prev]);
+          showToast(`Produk baru "${formData.name}" berhasil ditambahkan!`);
+        }
+
+        setIsAddModalOpen(false);
+        setEditingProduct(null);
+      };
+
+      // Hapus Produk
+      const handleDeleteProduct = (id, name) => {
+        if (confirm(`Yakin ingin menghapus produk "${name}"?`)) {
+          setProducts(prev => prev.filter(p => p.id !== id));
+          showToast(`Produk "${name}" telah dihapus.`);
+        }
+      };
+
+      // Ubah Status Pesanan
+      const handleUpdateOrderStatus = (orderId, newStatus) => {
+        setOrders(prev => prev.map(o => {
+          if (o.orderId === orderId) {
+            return { ...o, status: newStatus };
+          }
+          return o;
+        }));
+        showToast(`Status pesanan ${orderId} diubah menjadi "${newStatus}".`);
+      };
+
+      return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+          
+          {/* Header Admin */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-aromika-goldlight pb-6">
+            <div>
+              <span className="text-xs font-bold tracking-[0.25em] text-aromika-gold uppercase">Simulasi Manajemen</span>
+              <h1 className="font-serif text-3xl font-bold text-aromika-roast">Dashboard Admin Aromika</h1>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  setEditingProduct(null);
+                  setFormData({
+                    name: "",
+                    category: "Arabika",
+                    basePrice: 75000,
+                    stock: 20,
+                    aroma: 5,
+                    acidity: "Medium",
+                    body: "Full",
+                    flavorNotes: "Cokelat, Karamel, Floral",
+                    image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=800&auto=format&fit=crop",
+                    description: "Kopi pilihan nusantara berkualitas tinggi."
+                  });
+                  setIsAddModalOpen(true);
+                }}
+                className="px-4 py-2.5 bg-aromika-roast text-aromika-gold border border-aromika-gold rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-aromika-mocha transition-all shadow-md flex items-center space-x-2"
+              >
+                <span>+ Tambah Produk Baru</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Kartu Metrik Ringkasan */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-aromika-goldlight shadow-sm">
+              <span className="text-xs text-aromika-dark/60 block mb-1">Total Produk Aktif</span>
+              <p className="font-serif text-3xl font-bold text-aromika-roast">{products.length} SKU</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-aromika-goldlight shadow-sm">
+              <span className="text-xs text-aromika-dark/60 block mb-1">Jumlah Pesanan Masuk</span>
+              <p className="font-serif text-3xl font-bold text-aromika-roast">{orders.length} Order</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-aromika-goldlight shadow-sm">
+              <span className="text-xs text-aromika-dark/60 block mb-1">Total Penjualan Demo</span>
+              <p className="font-serif text-2xl font-bold text-aromika-mocha">{formatRupiah(totalSales)}</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-aromika-goldlight shadow-sm">
+              <span className="text-xs text-aromika-dark/60 block mb-1">Penyimpanan Demo</span>
+              <p className="font-serif text-2xl font-bold text-emerald-700">LocalStorage Active</p>
+            </div>
+          </div>
+
+          {/* Tab Selector */}
+          <div className="flex border-b border-aromika-goldlight space-x-8">
+            <button
+              onClick={() => setAdminTab("products")}
+              className={`pb-3 font-serif font-bold text-lg transition-colors relative ${
+                adminTab === "products" 
+                  ? "text-aromika-roast after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-aromika-gold" 
+                  : "text-aromika-dark/50 hover:text-aromika-dark"
+              }`}
+            >
+              Katalog Produk ({products.length})
+            </button>
+            <button
+              onClick={() => setAdminTab("orders")}
+              className={`pb-3 font-serif font-bold text-lg transition-colors relative ${
+                adminTab === "orders" 
+                  ? "text-aromika-roast after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-aromika-gold" 
+                  : "text-aromika-dark/50 hover:text-aromika-dark"
+              }`}
+            >
+              Kelola Pesanan Pelanggan ({orders.length})
+            </button>
+          </div>
+
+          {/* TAB 1: LIST PRODUK (CRUD) */}
+          {adminTab === "products" && (
+            <div className="bg-white rounded-2xl border border-aromika-goldlight overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-aromika-beige text-aromika-dark uppercase tracking-wider font-bold border-b border-aromika-goldlight">
+                    <tr>
+                      <th className="p-4">Foto & Nama</th>
+                      <th className="p-4">Kategori</th>
+                      <th className="p-4">Harga Dasar</th>
+                      <th className="p-4">Stok</th>
+                      <th className="p-4">Notes Rasa</th>
+                      <th className="p-4 text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-aromika-goldlight/40">
+                    {products.map(p => (
+                      <tr key={p.id} className="hover:bg-aromika-cream/50 transition-colors">
+                        <td className="p-4 flex items-center space-x-3">
+                          <img src={p.image} alt={p.name} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                          <div>
+                            <span className="font-bold text-aromika-dark block text-sm">{p.name}</span>
+                            <span className="text-[10px] text-aromika-dark/50">ID: {p.id}</span>
+                          </div>
+                        </td>
+                        <td className="p-4 font-semibold">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] ${
+                            p.category === 'Arabika' ? 'bg-amber-100 text-amber-900' : 'bg-stone-200 text-stone-900'
+                          }`}>
+                            {p.category}
+                          </span>
+                        </td>
+                        <td className="p-4 font-bold text-aromika-roast">
+                          {formatRupiah(p.basePrice)}
+                        </td>
+                        <td className="p-4 font-semibold">
+                          {p.stock} pcs
+                        </td>
+                        <td className="p-4 max-w-xs text-[11px] text-aromika-dark/70 truncate">
+                          {p.flavorNotes.join(", ")}
+                        </td>
+                        <td className="p-4 text-center space-x-2">
+                          <button
+                            onClick={() => handleOpenEdit(p)}
+                            className="px-3 py-1.5 bg-aromika-beige hover:bg-aromika-goldlight text-aromika-dark rounded-lg font-bold"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(p.id, p.name)}
+                            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-bold"
+                          >
+                            Hapus
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: LIST PESANAN */}
+          {adminTab === "orders" && (
+            <div className="bg-white rounded-2xl border border-aromika-goldlight overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-aromika-beige text-aromika-dark uppercase tracking-wider font-bold border-b border-aromika-goldlight">
+                    <tr>
+                      <th className="p-4">No. Pesanan & Waktu</th>
+                      <th className="p-4">Pelanggan</th>
+                      <th className="p-4">Item Kopi Dibeli</th>
+                      <th className="p-4">Total</th>
+                      <th className="p-4">Status & Ubah</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-aromika-goldlight/40">
+                    {orders.map(o => (
+                      <tr key={o.orderId} className="hover:bg-aromika-cream/50 transition-colors">
+                        <td className="p-4">
+                          <span className="font-mono font-bold text-aromika-roast block text-sm">{o.orderId}</span>
+                          <span className="text-[10px] text-aromika-dark/50">{o.date}</span>
+                        </td>
+                        <td className="p-4">
+                          <span className="font-bold text-aromika-dark block">{o.customerName}</span>
+                          <span className="text-[11px] text-aromika-dark/60">{o.phone}</span>
+                        </td>
+                        <td className="p-4 max-w-xs text-[11px]">
+                          {o.items.map((it, idx) => (
+                            <div key={idx} className="truncate">
+                              • {it.name} ({it.weight}, {it.grind}) x{it.qty}
+                            </div>
+                          ))}
+                        </td>
+                        <td className="p-4 font-bold text-aromika-mocha text-sm">
+                          {formatRupiah(o.total)}
+                        </td>
+                        <td className="p-4">
+                          <select
+                            value={o.status}
+                            onChange={(e) => handleUpdateOrderStatus(o.orderId, e.target.value)}
+                            className="bg-aromika-beige border border-aromika-goldlight text-aromika-dark text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none"
+                          >
+                            <option value="Menunggu Pembayaran">Menunggu Pembayaran</option>
+                            <option value="Diproses">Diproses</option>
+                            <option value="Dikirim">Dikirim</option>
+                            <option value="Selesai">Selesai</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL FORM TAMBAH / EDIT PRODUK */}
+          {isAddModalOpen && (
+            <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-aromika-cream text-aromika-dark rounded-3xl max-w-xl w-full p-8 shadow-2xl border border-aromika-gold relative">
+                <button 
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="absolute top-4 right-4 text-aromika-dark hover:text-red-500 p-2 font-bold"
+                >
+                  ✕
+                </button>
+
+                <h3 className="font-serif text-2xl font-bold text-aromika-roast mb-6">
+                  {editingProduct ? "Edit Informasi Produk" : "Tambah Biji Kopi Baru"}
+                </h3>
+
+                <form onSubmit={handleSaveProduct} className="space-y-4 text-xs max-h-[75vh] overflow-y-auto pr-2">
+                  <div>
+                    <label className="font-bold block mb-1">Nama Produk Kopi *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Contoh: Arabika Flores Bajawa"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none focus:ring-2 focus:ring-aromika-gold"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold block mb-1">Kategori Varietas</label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none"
+                      >
+                        <option value="Arabika">Arabika</option>
+                        <option value="Robusta">Robusta</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold block mb-1">Harga Dasar (100g) *</label>
+                      <input
+                        type="number"
+                        required
+                        value={formData.basePrice}
+                        onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold block mb-1">Jumlah Stok (pcs)</label>
+                      <input
+                        type="number"
+                        required
+                        value={formData.stock}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold block mb-1">Tingkat Aroma (1-5)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="5"
+                        step="0.5"
+                        value={formData.aroma}
+                        onChange={(e) => setFormData({ ...formData, aroma: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-bold block mb-1">Notes Rasa (Pisahkan koma)</label>
+                    <input
+                      type="text"
+                      value={formData.flavorNotes}
+                      onChange={(e) => setFormData({ ...formData, flavorNotes: e.target.value })}
+                      placeholder="Contoh: Chocolate, Nutty, Brown Sugar"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold block mb-1">URL Gambar (Unsplash/Direct Image)</label>
+                    <input
+                      type="url"
+                      value={formData.image}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      placeholder="https://..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold block mb-1">Deskripsi Singkat</label>
+                    <textarea
+                      rows="3"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-aromika-goldlight focus:outline-none"
+                    ></textarea>
+                  </div>
+
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddModalOpen(false)}
+                      className="px-4 py-2.5 text-xs font-bold text-aromika-dark hover:bg-aromika-beige rounded-xl"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 bg-aromika-roast text-aromika-gold border border-aromika-gold rounded-xl font-bold uppercase tracking-wider hover:bg-aromika-mocha transition-all"
+                    >
+                      Simpan Produk
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    // =========================================================
+    // MOUNT TO DOM
+    // =========================================================
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
